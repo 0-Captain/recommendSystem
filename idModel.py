@@ -52,7 +52,7 @@ from tensorflow.keras import regularizers, optimizers
 
 
 def Recmand_model(max_user, max_item, k):
-    input_uer = Input(shape=(1, ), dtype="int64")
+    input_uer = Input(shape=(1, ), dtype="float32")
     model_uer = Embedding(max_user + 1, k, input_length=1,)(input_uer)
     model_uer = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_uer)
     model_uer = Dense(k, activation="relu", use_bias=True,)(model_uer)  # 激活函数
@@ -61,7 +61,7 @@ def Recmand_model(max_user, max_item, k):
     # model_uer = Dense(50, activation="relu")(model_uer)  # 激活函数
     model_uer = Reshape((-1,))(model_uer)
 
-    input_item = Input(shape=(1,), dtype="int64")
+    input_item = Input(shape=(1,), dtype="float32")
     model_item = Embedding(max_item + 1, k, input_length=1,)(input_item)
     model_item = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_item)
     model_item = Dense(k, activation="relu", use_bias=True,)(model_item)
