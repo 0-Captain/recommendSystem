@@ -17,7 +17,7 @@ pd.set_option('display.max_columns', 12)
 pd.set_option('display.width', 240)
 pd.set_option('float_format', lambda x: '%.4f' % x)
 
-dataPath = '../../dataset/ml-1m/'
+dataPath = '../ml-1m/'
 
 
 def genres_multi_hot(genre_int_map):

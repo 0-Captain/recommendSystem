@@ -12,7 +12,7 @@ def root_mean_squared_error(y_true, y_pred):
     return K.sqrt(K.mean(K.square(y_pred - y_true)))
 
 rnames = ['userId', 'movieId', 'rating', 'timestamp']
-rating = pd.read_csv("../../dataset/ml-1m/ratings.dat", sep="::", names=rnames,header=None, engine='python')
+rating = pd.read_csv("../ml-1m/ratings.dat", sep="::", names=rnames,header=None, engine='python')
 rating = rating.sample(frac=1)
 num_rating = len(rating['rating'])
 max_user = rating["userId"].max()
