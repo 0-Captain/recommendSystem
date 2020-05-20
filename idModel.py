@@ -4,6 +4,10 @@ from tensorflow.keras import backend as K
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+import tensorflow as tf
+
+print(tf.__version__)
+
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 
@@ -13,9 +17,10 @@ def root_mean_squared_error(y_true, y_pred):
 
 rnames = ['userId', 'movieId', 'rating', 'timestamp']
 rating = pd.read_csv("../ml-1m/ratings.dat", sep="::", names=rnames,header=None, engine='python')
-rating['rating'].astype = 'float32'
-rating['userId'].astype = 'float32'
-rating['movieId'].astype = 'float32'
+# rating['rating'] = rating['rating'].astype('float32')
+# rating['userId'] = rating['userId'].astype('float32')
+# rating['movieId'] = rating['movieId'].astype('float32')
+rating.info()
 rating = rating.sample(frac=1)
 num_rating = len(rating['rating'])
 max_user = rating["userId"].max()
@@ -36,26 +41,8 @@ from tensorflow.keras.layers import Embedding, Reshape, Input, Dot, Dense, Dropo
 from tensorflow.keras import regularizers, optimizers
 
 
-# def Recmand_model(max_user, max_movie, k):
-#     input_uer = Input(shape=[None, ], dtype="int32")
-#     model_uer = Embedding(max_user + 1, k, input_length=1, embeddings_regularizer=regularizers.l2(0.001))(input_uer)
-#     model_uer = Reshape((k,))(model_uer)
-#
-#     input_movie = Input(shape=[None, ], dtype="int32")
-#     model_movie = Embedding(max_movie + 1, k, input_length=1, embeddings_regularizer=regularizers.l2(0.001))(
-#         input_movie)
-#     model_movie = Reshape((k,))(model_movie)
-#
-#     out = Dot(1)([model_uer, model_movie])
-#     out = Dense(11, activation='softmax')(out)
-#     model = Model(inputs=[input_uer, input_movie], outputs=out)
-#     model.compile(loss='categorical_crossentropy', optimizer='Adam', metrics=['acc'])
-#     model.summary()
-#     return model
-
-
 def Recmand_model(max_user, max_item, k):
-    input_uer = Input(shape=(1, ), dtype="float32")
+    input_uer = Input(shape=(1, ))
     model_uer = Embedding(max_user + 1, k, input_length=1,)(input_uer)
     model_uer = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_uer)
     model_uer = Dense(k, activation="relu", use_bias=True,)(model_uer)  # 激活函数
@@ -64,7 +51,7 @@ def Recmand_model(max_user, max_item, k):
     # model_uer = Dense(50, activation="relu")(model_uer)  # 激活函数
     model_uer = Reshape((-1,))(model_uer)
 
-    input_item = Input(shape=(1,), dtype="float32")
+    input_item = Input(shape=(1,))
     model_item = Embedding(max_item + 1, k, input_length=1,)(input_item)
     model_item = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_item)
     model_item = Dense(k, activation="relu", use_bias=True,)(model_item)
@@ -89,7 +76,7 @@ train_y = rating["rating"].values
 # train_y = rating["rating"].values * 2
 # train_y = utils.to_categorical(train_y, num_classes=11)  # one-hot 0~5间隔为0.5，总共有11类
 
-history = model.fit(train_x, train_y, batch_size=256, epochs=3, verbose=1, validation_split=0.2)
+history = model.fit(train_x, train_y, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
 #
 # def plot_history(history):
 #   hist = pd.DataFrame(history.history)
