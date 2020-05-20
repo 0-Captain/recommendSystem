@@ -13,6 +13,9 @@ def root_mean_squared_error(y_true, y_pred):
 
 rnames = ['userId', 'movieId', 'rating', 'timestamp']
 rating = pd.read_csv("../ml-1m/ratings.dat", sep="::", names=rnames,header=None, engine='python')
+rating['rating'].astype = 'float32'
+rating['userId'].astype = 'float32'
+rating['movieId'].astype = 'float32'
 rating = rating.sample(frac=1)
 num_rating = len(rating['rating'])
 max_user = rating["userId"].max()
