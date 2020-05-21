@@ -67,7 +67,7 @@ def Recmand_model(max_user, max_item, k):
     # model.summary()
     return model
 
-model = Recmand_model(max_user, max_movie, 100)
+model = Recmand_model(max_user, max_movie, 150)
 
 train_user = rating['userId'].values
 train_movie = rating['movieId'].values
