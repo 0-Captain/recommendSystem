@@ -1,11 +1,12 @@
 import pandas as pd
 import numpy as np
+import math
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 import tensorflow as tf
-from tensorflow.keras.layers import Dense, Embedding, Concatenate, Input, Reshape, Dropout, Flatten, Dot, BatchNormalization
-from tensorflow.keras import Model, regularizers, optimizers
+from tensorflow.keras.layers import Dense, Embedding, Concatenate, Input, Reshape, Dropout, Flatten, Dot, BatchNormalization, Lambda, Add
+from tensorflow.keras import Model, regularizers, optimizers, constraints
 from tensorflow.keras import backend as K
 
 # 自定义损失函数rmse
@@ -123,30 +124,47 @@ moviesIdInputDim = data['movieId'].values.max()
 moviesGenresInputDim = len(moviesGenresSet)
 moviesTitleInputDim = len(moviesTitleSet)
 
+def sqrt(x):
+    x = x + 0.00000001
+    sign = x / x
+    abs = K.abs(x)
+    s = K.sqrt(abs)
+    return s * sign
 
 def createModel(k):
-    input_uer = Input(shape=(1,))
-    model_uer = Embedding(usersIdInputDim + 1, k, input_length=1, )(input_uer)
-    model_uer = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_uer)
-    model_uer = Dense(k, activation="relu", use_bias=True, )(model_uer)  # 激活函数
-    # model_uer = Dropout(0.1)(model_uer)  # Dropout 随机删去一些节点，防止过拟合
-    model_uer = Dense(50, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.005))(
-        model_uer)  # 激活函数
-    # model_uer = Dense(50, activation="relu")(model_uer)  # 激活函数
-    model_uer = Reshape((-1,))(model_uer)
+    input_uid = Input(shape=(1,))
+    model_uid = Embedding(usersIdInputDim + 1, k, input_length=1, )(input_uid)
+    model_uid = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_uid)
+    model_uid = Dense(k, activation="relu", use_bias=True, )(model_uid)  # 激活函数
+    model_uid = Dense(50, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.005))(model_uid)  # 激活函数
+    model_uid = Flatten()(model_uid)
 
-    input_item = Input(shape=(1,))
-    model_item = Embedding(moviesIdInputDim + 1, k, input_length=1, )(input_item)
-    model_item = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_item)
-    model_item = Dense(k, activation="relu", use_bias=True, )(model_item)
-    # model_item = Dropout(0.1)(model_item)
-    model_item = Dense(50, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.005))(
-        model_item)  # 激活函数
-    # model_item = Dense(50, activation="relu")(model_item)  # 激活函数
-    model_item = Reshape((-1,))(model_item)
+    user_gender_input = Input(shape=(1,))
+    model_gender = Embedding(3, 2)(user_gender_input)
+    model_gender = Dense(50, activation="relu", use_bias=True, kernel_constraint=constraints.NonNeg())(model_gender)
+    model_gender = Flatten()(model_gender)
+    model_gender = Lambda(sqrt)(model_gender)
 
-    out = Dot(1)([model_uer, model_item])  # 点积运算
+    model_user = Add()([model_uid, model_gender])
 
-    model = Model(inputs=[input_uer, input_item], outputs=out)
+    input_iid = Input(shape=(1,))
+    model_iid = Embedding(moviesIdInputDim + 1, k, input_length=1, )(input_iid)
+    model_iid = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_iid)
+    model_iid = Dense(k, activation="relu", use_bias=True, )(model_iid)
+    model_iid = Dense(50, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.005))(model_iid)  # 激活函数
+    model_item = Flatten()(model_iid)
+
+    out = Dot(1)([model_user, model_item])  # 点积运算
+
+    model = Model(inputs=[input_uid, input_iid, user_gender_input], outputs=out)
     model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.0005), metrics=['mae'])
-    return
+    return model
+
+
+model = createModel(50)
+
+
+train_x = [usersId, moviesId, usersGender]
+train_y = userRatings
+
+history = model.fit(train_x, train_y, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
