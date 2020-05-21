@@ -82,7 +82,7 @@ movies['movieId'] = movies['movieId'].map(moviesIdMap)
 # 读取user数据:
 
 usersTitle = ['userId', 'gender', 'age', 'jobId', 'zip-code']
-users = pd.read_table(dataPath + 'users.dat', sep='::', header=None, names=usersTitle, engine='python')
+users = pd.read_csv(dataPath + 'users.dat', sep='::', header=None, names=usersTitle, engine='python')
 genderMap = {'F': 0, 'M': 1}
 users['genderIndex'] = users['gender'].map(genderMap)
 ageMap = {val: index for index, val in enumerate(set(users['age']))}
@@ -92,7 +92,7 @@ users['ageIndex'] = users['age'].map(ageMap)
 # 读取ratings数据:
 
 ratingsTitle = ['userId', 'movieId', 'ratings', 'timestamps']
-ratings = pd.read_table(dataPath + 'ratings.dat', sep='::', header=None, names=ratingsTitle, engine='python')
+ratings = pd.read_csv(dataPath + 'ratings.dat', sep='::', header=None, names=ratingsTitle, engine='python')
 ratings['movieId'] = ratings['movieId'].map(moviesIdMap)
 
 data = pd.merge(pd.merge(ratings, users), movies)
@@ -141,7 +141,8 @@ def createModel(k):
 
     user_gender_input = Input(shape=(1,))
     model_gender = Embedding(3, 2)(user_gender_input)
-    model_gender = Dense(50, activation="relu", use_bias=True, kernel_constraint=constraints.NonNeg())(model_gender)
+    model_gender = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_gender)
+    model_gender = Dense(50, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.1))(model_gender)
     model_gender = Flatten()(model_gender)
     model_gender = Lambda(sqrt)(model_gender)
 
