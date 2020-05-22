@@ -106,18 +106,22 @@ dataInfo = pd.DataFrame({
 })
 print(dataInfo.T)
 
+# 划分train与dev
+trainData = data.sample(frac=0.8, random_state=0)
+devData = data.drop(trainData.index)
 
+# print(trainData.info(), testData.info())
 # 从总的table中获取单列数据
-userRatings = data['ratings'].values
+userRatings = trainData['ratings'].values
 
-usersId = data['userId'].values
-usersGender = data["genderIndex"].values
-usersAge = data['ageIndex'].values
-usersJobId = data['jobId'].values
+usersId = trainData['userId'].values
+usersGender = trainData["genderIndex"].values
+usersAge = trainData['ageIndex'].values
+usersJobId = trainData['jobId'].values
 
-moviesId = data['movieId'].values
-moviesGenres = np.array([value for value in data['genresEncoding'].values])
-moviesTitle = np.array([list(value) for value in data['titleEncoding'].values])
+moviesId = trainData['movieId'].values
+moviesGenres = np.array([value for value in trainData['genresEncoding'].values])
+moviesTitle = np.array([list(value) for value in trainData['titleEncoding'].values])
 
 usersIdInputDim = data['userId'].values.max()
 moviesIdInputDim = data['movieId'].values.max()
@@ -126,10 +130,12 @@ moviesTitleInputDim = len(moviesTitleSet)
 
 def sqrt(x):
     x = x + 0.00000001
-    sign = x / x
     abs = K.abs(x)
+    sign = x / abs
     s = K.sqrt(abs)
-    return s * sign
+    result = s * sign
+    # result = K.reshape(result, (1, -1))
+    return K.tile(result, [1, 50])
 
 def createModel(k):
     input_uid = Input(shape=(1,))
@@ -140,10 +146,11 @@ def createModel(k):
     model_uid = Flatten()(model_uid)
 
     user_gender_input = Input(shape=(1,))
-    model_gender = Embedding(3, 2)(user_gender_input)
-    model_gender = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_gender)
-    model_gender = Dense(50, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.1))(model_gender)
-    model_gender = Flatten()(model_gender)
+    # model_gender = Embedding(3, 2, )(user_gender_input)
+    # embeddings_constraint=constraints.MinMaxNorm(min_value=0.000001, max_value=0.29)
+    # model_gender = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_gender)
+    model_gender = Dense(1, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.1))(user_gender_input)
+    # model_gender = Flatten()(model_gender)
     model_gender = Lambda(sqrt)(model_gender)
 
     model_user = Add()([model_uid, model_gender])
@@ -159,6 +166,8 @@ def createModel(k):
 
     model = Model(inputs=[input_uid, input_iid, user_gender_input], outputs=out)
     model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.0005), metrics=['mae'])
+
+    model2 = Model(inputs=[input_uid, input_iid, user_gender_input], outputs=out)
     return model
 
 
@@ -168,4 +177,4 @@ model = createModel(50)
 train_x = [usersId, moviesId, usersGender]
 train_y = userRatings
 
-history = model.fit(train_x, train_y, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
+history = model.fit(train_x, train_y, batch_size=256, epochs=1, verbose=1, validation_split=0.2)
