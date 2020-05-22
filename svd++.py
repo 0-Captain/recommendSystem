@@ -146,21 +146,26 @@ def createModel(k):
     model_uid = Flatten()(model_uid)
 
     movie_genres = Input(shape=(moviesGenresInputDim,))
-    genres = Dense(k, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.005))(movie_genres)
+    genres = Reshape((1, -1))(movie_genres)
+    genres = Dense(k, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.005))(genres)
 
-    model_user = Add()([model_uid, genres])
+    model_user = genres
+    # model_user = Add()([model_uid, genres])
 
     input_iid = Input(shape=(1,))
     model_iid = Embedding(moviesIdInputDim + 1, k, input_length=1, )(input_iid)
     model_iid = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_iid)
     model_iid = Dense(k, activation="relu", use_bias=True, )(model_iid)
     model_iid = Dense(k, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.005))(model_iid)  # 激活函数
-    model_item = Flatten()(model_iid)
+    model_iid = Flatten()(model_iid)
+
+    model_item = Add()([model_iid, genres])
 
     out = Dot(1)([model_user, model_item])  # 点积运算
 
     model = Model(inputs=[input_uid, input_iid, movie_genres], outputs=out)
     model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.0005), metrics=['mae'])
+    tf.keras.utils.plot_model(model, "my_model.png", show_shapes=True)
 
     # model2 = Model(inputs=[input_uid, input_iid, user_gender_input], outputs=out)
     return model
