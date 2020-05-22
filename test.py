@@ -177,4 +177,4 @@ model = createModel(50)
 train_x = [usersId, moviesId, usersGender]
 train_y = userRatings
 
-history = model.fit(train_x, train_y, batch_size=256, epochs=1, verbose=1, validation_split=0.2)
+history = model.fit(train_x, train_y, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
