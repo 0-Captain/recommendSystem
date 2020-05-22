@@ -148,8 +148,8 @@ def createModel(k):
     user_gender_input = Input(shape=(1,))
     # model_gender = Embedding(3, 2, )(user_gender_input)
     # embeddings_constraint=constraints.MinMaxNorm(min_value=0.000001, max_value=0.29)
-    model_gender = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(user_gender_input)
-    model_gender = Dense(1, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.1))(model_gender)
+    model_gender = Dense(1, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.1))(user_gender_input)
+    model_gender = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_gender)
     # model_gender = Flatten()(model_gender)
     model_gender = Lambda(sqrt)(model_gender)
 
