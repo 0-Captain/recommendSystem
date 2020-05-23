@@ -205,7 +205,7 @@ model = Model(inputs=[usersGenderInput,usersAgeInput, usersJobIdInput,moviesGenr
 
 model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.001), metrics=['mae'])
 # model.summary()
-tf.keras.utils.plot_model(model, "info_model.png", show_shapes=True)
+# tf.keras.utils.plot_model(model, "info_model.png", show_shapes=True)
 
 history = model.fit([usersGender, usersAge, usersJobId, moviesGenres, moviesTitle], userRatings, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
 
