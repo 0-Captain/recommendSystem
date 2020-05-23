@@ -84,7 +84,7 @@ movies['movieId'] = movies['movieId'].map(moviesIdMap)
 # 读取user数据:
 
 usersTitle = ['userId', 'gender', 'age', 'jobId', 'zip-code']
-users = pd.read_table(dataPath + 'users.dat', sep='::', header=None, names=usersTitle, engine='python')
+users = pd.read_csv(dataPath + 'users.dat', sep='::', header=None, names=usersTitle, engine='python')
 genderMap = {'F': 0, 'M': 1}
 users['genderIndex'] = users['gender'].map(genderMap)
 ageMap = {val: index for index, val in enumerate(set(users['age']))}
@@ -94,7 +94,7 @@ users['ageIndex'] = users['age'].map(ageMap)
 # 读取ratings数据:
 
 ratingsTitle = ['userId', 'movieId', 'ratings', 'timestamps']
-ratings = pd.read_table(dataPath + 'ratings.dat', sep='::', header=None, names=ratingsTitle, engine='python')
+ratings = pd.read_csv(dataPath + 'ratings.dat', sep='::', header=None, names=ratingsTitle, engine='python')
 ratings['movieId'] = ratings['movieId'].map(moviesIdMap)
 
 # data = pd.merge(pd.merge(ratings, movies, sort=False, on='movieId'), users, sort=False, on='userId')
