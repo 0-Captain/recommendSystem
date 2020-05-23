@@ -124,6 +124,7 @@ moviesGenres = np.array([value for value in trainData['genresEncoding'].values])
 moviesTitle = np.array([list(value) for value in trainData['titleEncoding'].values])
 
 usersIdInputDim = data['userId'].values.max()
+usersJobInoutDim = data['jobId'].values.max()
 moviesIdInputDim = data['movieId'].values.max()
 moviesGenresInputDim = len(moviesGenresSet)
 moviesTitleInputDim = len(moviesTitleSet)
@@ -148,12 +149,17 @@ def createModel(k):
     user_gender_input = Input(shape=(1,), name='user_gender')
     # model_gender = Embedding(3, 2, )(user_gender_input)
     # embeddings_constraint=constraints.MinMaxNorm(min_value=0.000001, max_value=0.29)
-    model_gender = Dense(1, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.01))(user_gender_input)
-    # model_gender = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_gender)
-    # model_gender = Flatten()(model_gender)
-    model_gender = Lambda(sqrt)(model_gender)
+    user_gender = Dense(1, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.01))(user_gender_input)
 
-    model_user = Add()([model_uid, model_gender])
+    user_job_input = Input(shape=(1,), name='user_job')
+    user_job = Embedding(usersJobInoutDim+1, 5)(user_job_input)
+    user_job = Dense(1, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.01))(user_job)
+    user_job = Flatten()(user_job)
+
+    user_info = Add()([user_job, user_gender])
+    user_info = Lambda(sqrt)(user_info)
+
+    model_user = Add()([model_uid, user_info])
 
     input_iid = Input(shape=(1,), name="movie_matrix")
     model_iid = Embedding(moviesIdInputDim + 1, k, input_length=1, )(input_iid)
@@ -164,18 +170,18 @@ def createModel(k):
 
     out = Dot(1)([model_user, model_item])  # 点积运算
 
-    model = Model(inputs=[input_uid, input_iid, user_gender_input], outputs=out)
+    model = Model(inputs=[input_uid, input_iid, user_gender_input, user_job_input], outputs=out)
     model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.0005), metrics=['mae'])
     tf.keras.utils.plot_model(model, "test_model.png", show_shapes=True)
 
-    model2 = Model(inputs=[input_uid, input_iid, user_gender_input], outputs=out)
+    model2 = Model(inputs=[input_uid, input_iid, user_gender_input, user_job_input], outputs=out)
     return model
 
 
 model = createModel(50)
 
 
-train_x = [usersId, moviesId, usersGender]
+train_x = [usersId, moviesId, usersGender, usersJobId]
 train_y = userRatings
 
-# history = model.fit(train_x, train_y, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
+history = model.fit(train_x, train_y, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
