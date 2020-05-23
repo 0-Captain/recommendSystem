@@ -47,13 +47,13 @@ def Recmand_model(max_user, max_item, k):
     model_uer = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_uer)
     model_uer = Dense(k, activation="relu", use_bias=True,)(model_uer)  # 激活函数
     model_uer = Dense(50, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.005))(model_uer)  # 激活函数
-    # model_uer = Dense(50, activation="relu")(model_uer)  # 激活函数
     model_uer = Reshape((-1,))(model_uer)
+
 
     input_item = Input(shape=(1,))
     model_item = Embedding(max_item + 1, k, input_length=1,)(input_item)
     model_item = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_item)
-    model_item = Dense(k, activation="relu", use_bias=True,)(model_item)
+    # model_item = Dense(k, activation="relu", use_bias=True,)(model_item)
     model_item = Dense(50, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.005))(model_item)  # 激活函数
     # model_item = Dense(50, activation="relu")(model_item)  # 激活函数
     model_item = Reshape((-1,))(model_item)
@@ -63,7 +63,6 @@ def Recmand_model(max_user, max_item, k):
     model = Model(inputs=[input_uer, input_item], outputs=out)
     model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.0005), metrics=['mae'])
     # model.summary()
-    tf.keras.utils.plot_model(model, "id_model.png", show_shapes=True)
     return model
 
 model = Recmand_model(max_user, max_movie, 50)
@@ -76,33 +75,3 @@ train_y = rating["rating"].values
 # train_y = utils.to_categorical(train_y, num_classes=11)  # one-hot 0~5间隔为0.5，总共有11类
 
 history = model.fit(train_x, train_y, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
-#
-# def plot_history(history):
-#   hist = pd.DataFrame(history.history)
-#   hist['epoch'] = history.epoch
-#
-#   plt.figure()
-#   plt.xlabel('Epoch')
-#   plt.ylabel('RMSE [rating]')
-#   plt.plot(hist['epoch'], hist['loss'],
-#            label='Train Error')
-#   plt.plot(hist['epoch'], hist['val_loss'],
-#            label = 'Val Error')
-#   plt.ylim([0,2])
-#   plt.legend()
-#
-#   plt.figure()
-#   plt.ylim(0, 2)
-#   plt.xlabel('Epoch')
-#   plt.ylabel('MAE [rating]')
-#   plt.plot(hist['epoch'], hist['mae'],
-#            label='Train Error')
-#   plt.plot(hist['epoch'], hist['val_mae'],
-#            label = 'Val Error')
-#   plt.ylim([0,1.2])
-#   plt.legend()
-#   plt.show()
-#
-#
-# plot_history(history)
-

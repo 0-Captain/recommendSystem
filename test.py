@@ -138,14 +138,14 @@ def sqrt(x):
     return K.tile(result, [1, 50])
 
 def createModel(k):
-    input_uid = Input(shape=(1,))
+    input_uid = Input(shape=(1,),name='user_matrix')
     model_uid = Embedding(usersIdInputDim + 1, k, input_length=1, )(input_uid)
     model_uid = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_uid)
     model_uid = Dense(k, activation="relu", use_bias=True, )(model_uid)  # 激活函数
     model_uid = Dense(50, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.005))(model_uid)  # 激活函数
     model_uid = Flatten()(model_uid)
 
-    user_gender_input = Input(shape=(1,))
+    user_gender_input = Input(shape=(1,), name='user_gender')
     # model_gender = Embedding(3, 2, )(user_gender_input)
     # embeddings_constraint=constraints.MinMaxNorm(min_value=0.000001, max_value=0.29)
     model_gender = Dense(1, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.01))(user_gender_input)
@@ -155,7 +155,7 @@ def createModel(k):
 
     model_user = Add()([model_uid, model_gender])
 
-    input_iid = Input(shape=(1,))
+    input_iid = Input(shape=(1,), name="movie_matrix")
     model_iid = Embedding(moviesIdInputDim + 1, k, input_length=1, )(input_iid)
     model_iid = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_iid)
     model_iid = Dense(k, activation="relu", use_bias=True, )(model_iid)
@@ -166,6 +166,7 @@ def createModel(k):
 
     model = Model(inputs=[input_uid, input_iid, user_gender_input], outputs=out)
     model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.0005), metrics=['mae'])
+    tf.keras.utils.plot_model(model, "test_model.png", show_shapes=True)
 
     model2 = Model(inputs=[input_uid, input_iid, user_gender_input], outputs=out)
     return model
@@ -177,4 +178,4 @@ model = createModel(50)
 train_x = [usersId, moviesId, usersGender]
 train_y = userRatings
 
-history = model.fit(train_x, train_y, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
+# history = model.fit(train_x, train_y, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
