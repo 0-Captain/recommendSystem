@@ -63,7 +63,7 @@ def Recmand_model(max_user, max_item, k):
     model = Model(inputs=[input_uer, input_item], outputs=out)
     model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.0005), metrics=['mae'])
     # model.summary()
-    tf.keras.utils.plot_model(model, "id_model.png", show_shapes=True)
+    # tf.keras.utils.plot_model(model, "id_model.png", show_shapes=True)
     return model
 
 model = Recmand_model(max_user, max_movie, 50)
