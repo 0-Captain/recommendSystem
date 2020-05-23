@@ -7,7 +7,7 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 # import matplotlib.pyplot as plt
 
 import tensorflow as tf
-from tensorflow.keras.layers import Dense, Embedding, Concatenate, Input, Reshape, Dropout, Flatten, Dot, BatchNormalization, Add
+from tensorflow.keras.layers import Dense, Embedding, Concatenate, Input, Reshape, Dropout, Flatten, Dot, BatchNormalization, Add, LSTM
 from tensorflow.keras import Model, regularizers, optimizers
 from tensorflow.keras import backend as K
 
@@ -137,27 +137,6 @@ moviesTitleInputDim = len(moviesTitleSet)
 
 
 idDropoutRate = 0.1
-# ----- id process
-# usersIdInput = Input(shape=(1, ), dtype="int32", name='userId')
-# usersIdModel = Embedding(usersIdInputDim + 1, idEmbeddingDimension, input_length=1,
-#                           embeddings_regularizer=regularizers.l2(0.001))(usersIdInput)
-# usersIdModel = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(usersIdModel)
-# usersIdModel = Dense(100, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.01))(usersIdModel)
-# usersIdModel = Dropout(rate=idDropoutRate)(usersIdModel)
-# usersIdModel = Reshape((idEmbeddingDimension,))(usersIdModel)
-#
-# moviesIdInput = Input(shape=(1,), dtype="int32", name='movieId')
-# moviesIdModel = Embedding(moviesIdInputDim+1, idEmbeddingDimension, input_length=1,
-#                           embeddings_regularizer=regularizers.l2(0.001))(moviesIdInput)
-# moviesIdModel = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(moviesIdModel)
-# moviesIdModel = Dense(100, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.01))(moviesIdModel)
-# moviesIdModel = Dropout(rate=idDropoutRate)(moviesIdModel)
-# moviesIdModel = Reshape((idEmbeddingDimension,))(moviesIdModel)
-#
-# idMolde = Dot(1)([usersIdModel, moviesIdModel])
-
-
-
 
 
 denseDimension = 16
@@ -186,45 +165,49 @@ usersJobIdModel = Dense(denseDimension, activation="relu", use_bias=True,kernel_
 # usersJobIdModel = Dropout(rate=dropoutRate)(usersJobIdModel)
 usersJobIdModel = Dense(denseDimension, activation="relu", use_bias=True,)(usersJobIdModel)
 
-userModel = Add()([usersGenderModel, usersAgeModel, usersJobIdModel])
-userModel = Flatten()(userModel)
+userModel = Concatenate(axis=1)([usersGenderModel, usersAgeModel, usersJobIdModel])
+# userModel = Flatten()(userModel)
 userDense1 = Dense(16, activation='relu', kernel_regularizer = regularizers.l2(0.001))(userModel)
 
 # ------------movie部分
 moviesGenresInput = Input(shape=(moviesGenresInputDim, ), dtype="float32", name='movieGenres')
 # moviesGenresModel = Reshape((1, moviesGenresInputDim))(moviesGenresInput)
 # moviesGenresEmbedding = Embedding(moviesGenresInputDim+1, 16, input_length=moviesGenresInputDim)(moviesGenresInput)
-moviesGenresModel = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(moviesGenresInput)
-moviesGenresModel = Dense(16, activation='relu', use_bias=True,kernel_regularizer=regularizers.l2(0.001))(moviesGenresModel)
+moviesGenresModel = Dense(16, activation='relu', use_bias=True,kernel_regularizer=regularizers.l2(0.001))(moviesGenresInput)
 moviesGenresModel = Dropout(rate=dropoutRate)(moviesGenresModel)
 moviesGenresModel = Dense(16, activation='relu', use_bias=True,)(moviesGenresModel)
+moviesGenresModel = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(moviesGenresModel)
+moviesGenresModel = Reshape((1,16))(moviesGenresModel)
 
-# moviesTitleInput = Input(shape=(15,), dtype="int32", name='movieTitle')
-# moviesTitleEmbedding = Embedding(moviesTitleInputDim+1, 4, input_length=15)(moviesTitleInput)
-# moviesTitleDense1 = Dense(16, activation='relu')(moviesTitleEmbedding)
-# moviesTitleDropout = Dropout(rate=dropoutRate)(moviesTitleDense1)
+moviesTitleInput = Input(shape=(15,), dtype="int32", name='movieTitle')
+moviesTitleModel = Embedding(moviesTitleInputDim+1, 32, input_length=15)(moviesTitleInput)
+moviesTitleModel = LSTM(16, activation='relu')(moviesTitleModel)
+moviesTitleModel = Dense(16, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.001))(moviesTitleModel)
+moviesTitleModel = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(moviesTitleModel)
+moviesTitleModel = Reshape((1,16))(moviesTitleModel)
 
-# movieModel = Concatenate(axis=1)([moviesIdDropout, moviesGenresDropout, ])
-# movieDense1 = Dense(64, activation='relu', kernel_regularizer = regularizers.l2(0.001))(movieModel)
+movieModel = Concatenate(axis=1)([moviesTitleModel, moviesGenresModel, ])
+movieModel = Dense(16, activation='relu', kernel_regularizer = regularizers.l2(0.001))(movieModel)
 
 # -----------combine
-combineModel = Dot(1)([userDense1, moviesGenresModel])
-# combineModelDense1 = Dense(64, activation='relu')(combineModel)
-# combineModelDense2 = Dense(16, activation='relu')(combineModelDense1)
-combineModelDense3 = Dense(1, activation='relu')(combineModel)
-combineModelReshape = Flatten()(combineModelDense3)
-out = Dense(1, activation='relu')(combineModelReshape)
+combineModel = Concatenate(axis=1)([userDense1, movieModel])
+combineModel = Flatten()(combineModel)
+combineModel = Dense(32, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.00))(combineModel)
+combineModel = Dense(16, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.00))(combineModel)
+combineModel = Dense(8, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.00))(combineModel)
+combineModel = Dense(4, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.00))(combineModel)
+combineModel = Dense(1, activation='relu')(combineModel)
 
 # combineMode2 = Dot(1)([combineModelDense4, idMolde])
 # out = Dense(1, activation='relu', kernel_regularizer=regularizers.l2(0.005))(combineModelReshape)
 
-model = Model(inputs=[usersGenderInput,usersAgeInput, usersJobIdInput,moviesGenresInput,], outputs=out)
+model = Model(inputs=[usersGenderInput,usersAgeInput, usersJobIdInput,moviesGenresInput,moviesTitleInput], outputs=combineModel)
 
 model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.001), metrics=['mae'])
 # model.summary()
-# tf.keras.utils.plot_model(model, "my_model.png", show_shapes=True)
+tf.keras.utils.plot_model(model, "info_model.png", show_shapes=True)
 
-history = model.fit([usersGender, usersAge, usersJobId, moviesGenres,], userRatings, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
+history = model.fit([usersGender, usersAge, usersJobId, moviesGenres, moviesTitle], userRatings, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
 
 # hist = pd.DataFrame(history.history)
 # hist['epoch'] = history.epoch
