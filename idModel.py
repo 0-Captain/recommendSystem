@@ -63,7 +63,7 @@ def Recmand_model(max_user, max_item, k):
     model = Model(inputs=[input_uer, input_item], outputs=out)
     model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.0005), metrics=['mae'])
     # model.summary()
-    # tf.keras.utils.plot_model(model, "id_model.png", show_shapes=True)
+    tf.keras.utils.plot_model(model, "id_model.png", show_shapes=True)
     return model
 
 model = Recmand_model(max_user, max_movie, 50)
@@ -75,7 +75,7 @@ train_y = rating["rating"].values
 # train_y = rating["rating"].values * 2
 # train_y = utils.to_categorical(train_y, num_classes=11)  # one-hot 0~5间隔为0.5，总共有11类
 
-history = model.fit(train_x, train_y, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
+# history = model.fit(train_x, train_y, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
 #
 # def plot_history(history):
 #   hist = pd.DataFrame(history.history)
