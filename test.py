@@ -172,7 +172,7 @@ def createModel(k):
 
     model = Model(inputs=[input_uid, input_iid, user_gender_input, user_job_input], outputs=out)
     model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.0005), metrics=['mae'])
-    tf.keras.utils.plot_model(model, "test_model.png", show_shapes=True)
+    # tf.keras.utils.plot_model(model, "test_model.png", show_shapes=True)
 
     model2 = Model(inputs=[input_uid, input_iid, user_gender_input, user_job_input], outputs=out)
     return model
