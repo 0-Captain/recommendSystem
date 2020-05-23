@@ -110,8 +110,6 @@ dataInfo = pd.DataFrame({
     '矩阵填充率: ': [len(ratings['ratings'].values)/(movies['movieId'].max()*users['userId'].max())]
 })
 print(dataInfo.T)
-print(data.info())
-print(data.describe())
 
 print(len(ratings['ratings'].values), len(data['ratings'].values))
 
@@ -222,11 +220,11 @@ out = Dense(1, activation='relu')(combineModelReshape)
 
 model = Model(inputs=[usersGenderInput,usersAgeInput, usersJobIdInput,moviesGenresInput,], outputs=out)
 
-model.compile(loss=root_mean_squared_error, optimizer='adam', metrics=['mae'])
+model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.001), metrics=['mae'])
 # model.summary()
 # tf.keras.utils.plot_model(model, "my_model.png", show_shapes=True)
 
-history = model.fit([usersGender, usersAge, usersJobId, moviesGenres,], userRatings, batch_size=256, epochs=3, verbose=1, validation_split=0.2)
+history = model.fit([usersGender, usersAge, usersJobId, moviesGenres,], userRatings, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
 
 # hist = pd.DataFrame(history.history)
 # hist['epoch'] = history.epoch
