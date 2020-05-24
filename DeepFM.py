@@ -34,7 +34,7 @@ print(pd.DataFrame({
 }, index=[0]))
 
 from tensorflow.keras import Model, utils
-from tensorflow.keras.layers import Embedding, Reshape, Input, Dot, Dense, Dropout, BatchNormalization, Concatenate,Add
+from tensorflow.keras.layers import Embedding, Reshape, Input, Dot, Dense, Dropout, BatchNormalization, Concatenate, Add
 from tensorflow.keras import regularizers, optimizers
 
 
@@ -73,6 +73,7 @@ def Recmand_model(max_user, max_item, k):
     Deep_model = Dense(1, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.000))(Deep_model)
 
     DeepFM = Add()([Deep_model, FM])
+    DeepFM = Dense(1, activation='relu', use_bias=True)(DeepFM)
 
     model = Model(inputs=[input_user, input_item], outputs=DeepFM)
     model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.0005), metrics=['mae'])
@@ -87,5 +88,5 @@ train_movie = rating['movieId'].values
 train_x = [train_user, train_movie]
 train_y = rating["rating"].values
 
-history = model.fit(train_x, train_y, batch_size=256, epochs=8, verbose=1, validation_split=0.2)
+history = model.fit(train_x, train_y, batch_size=256, epochs=12, verbose=1, validation_split=0.2)
 
