@@ -192,10 +192,10 @@ movieModel = Dense(16, activation='relu', kernel_regularizer = regularizers.l2(0
 # -----------combine
 combineModel = Concatenate(axis=1)([userDense1, movieModel])
 combineModel = Flatten()(combineModel)
-combineModel = Dense(32, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.00))(combineModel)
-combineModel = Dense(16, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.00))(combineModel)
-combineModel = Dense(8, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.00))(combineModel)
-combineModel = Dense(4, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.00))(combineModel)
+combineModel = Dense(32, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.001))(combineModel)
+combineModel = Dense(16, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.001))(combineModel)
+combineModel = Dense(8, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.001))(combineModel)
+combineModel = Dense(4, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.001))(combineModel)
 combineModel = Dense(1, activation='relu')(combineModel)
 
 # combineMode2 = Dot(1)([combineModelDense4, idMolde])
