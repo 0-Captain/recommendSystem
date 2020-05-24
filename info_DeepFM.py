@@ -236,7 +236,7 @@ def DeepFM():
     model = Model(inputs=[usersGenderInput, usersAgeInput, usersJobIdInput, moviesTitleInput, moviesGenresInput], outputs=out)
     model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.001), metrics=['mae'])
     # model.summary()
-    tf.keras.utils.plot_model(model, "info_model.png", show_shapes=True)
+    # tf.keras.utils.plot_model(model, "info_model.png", show_shapes=True)
     return model
 
 model = DeepFM()
