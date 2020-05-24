@@ -66,11 +66,11 @@ def Recmand_model(max_user, max_item, k):
 
     Deep_model = Concatenate()([Deep_user, Deep_item])
     Deep_model = Dense(64, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.005))(Deep_model)
-    Deep_model = Dense(32, activation="relu", use_bias=True)(Deep_model)
-    Deep_model = Dense(16, activation="relu", use_bias=True)(Deep_model)
+    Deep_model = Dense(32, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.000))(Deep_model)
+    Deep_model = Dense(16, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.000))(Deep_model)
     Deep_model = Dense(8, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.005))(Deep_model)
-    Deep_model = Dense(4, activation="relu", use_bias=True)(Deep_model)
-    Deep_model = Dense(1, activation="relu", use_bias=True)(Deep_model)
+    Deep_model = Dense(4, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.000))(Deep_model)
+    Deep_model = Dense(1, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.000))(Deep_model)
 
     DeepFM = Add()([Deep_model, FM])
 
