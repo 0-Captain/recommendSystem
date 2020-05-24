@@ -210,9 +210,9 @@ def deep():
     combineModel = Concatenate(axis=1)([user, movie])
     combineModel = Flatten()(combineModel)
     combineModel = Dense(32, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.001))(combineModel)
-    combineModel = Dense(16, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.00))(combineModel)
+    combineModel = Dense(16, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.001))(combineModel)
     combineModel = Dense(8, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.001))(combineModel)
-    combineModel = Dense(4, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.00))(combineModel)
+    combineModel = Dense(4, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.001))(combineModel)
     combineModel = Dense(1, activation='relu')(combineModel)
     return combineModel
 
@@ -234,7 +234,7 @@ def DeepFM():
     DeepFMmodel = Add()([deepModel, FMmodel])
     out = Activation("relu")(DeepFMmodel)
     model = Model(inputs=[usersGenderInput, usersAgeInput, usersJobIdInput, moviesTitleInput, moviesGenresInput], outputs=out)
-    model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.001), metrics=['mae'])
+    model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.0005), metrics=['mae'])
     # model.summary()
     # tf.keras.utils.plot_model(model, "info_model.png", show_shapes=True)
     return model
