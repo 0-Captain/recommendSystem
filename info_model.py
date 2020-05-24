@@ -171,8 +171,6 @@ userDense1 = Dense(16, activation='relu', kernel_regularizer = regularizers.l2(0
 
 # ------------movie部分
 moviesGenresInput = Input(shape=(moviesGenresInputDim, ), dtype="float32", name='movieGenres')
-# moviesGenresModel = Reshape((1, moviesGenresInputDim))(moviesGenresInput)
-# moviesGenresEmbedding = Embedding(moviesGenresInputDim+1, 16, input_length=moviesGenresInputDim)(moviesGenresInput)
 moviesGenresModel = Dense(16, activation='relu', use_bias=True,kernel_regularizer=regularizers.l2(0.001))(moviesGenresInput)
 moviesGenresModel = Dropout(rate=dropoutRate)(moviesGenresModel)
 moviesGenresModel = Dense(16, activation='relu', use_bias=True,)(moviesGenresModel)
@@ -193,9 +191,9 @@ movieModel = Dense(16, activation='relu', kernel_regularizer = regularizers.l2(0
 combineModel = Concatenate(axis=1)([userDense1, movieModel])
 combineModel = Flatten()(combineModel)
 combineModel = Dense(32, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.001))(combineModel)
-combineModel = Dense(16, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.001))(combineModel)
+combineModel = Dense(16, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.00))(combineModel)
 combineModel = Dense(8, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.001))(combineModel)
-combineModel = Dense(4, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.001))(combineModel)
+combineModel = Dense(4, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.00))(combineModel)
 combineModel = Dense(1, activation='relu')(combineModel)
 
 # combineMode2 = Dot(1)([combineModelDense4, idMolde])
