@@ -74,7 +74,7 @@ def Recmand_model(max_user, max_item, k):
     Deep_model = Dense(1, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.000))(Deep_model)
 
     DeepFM = Add()([Deep_model, FM])
-    DeepFM = Dense(1, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.01))(DeepFM)
+    # DeepFM = Dense(1, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.01))(DeepFM)
 
     model = Model(inputs=[input_user, input_item], outputs=DeepFM)
     model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.0005), metrics=['mae'])
