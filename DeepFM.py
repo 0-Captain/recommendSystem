@@ -34,7 +34,7 @@ print(pd.DataFrame({
 }, index=[0]))
 
 from tensorflow.keras import Model, utils
-from tensorflow.keras.layers import Embedding, Reshape, Input, Dot, Dense, Dropout, BatchNormalization, Concatenate, Add
+from tensorflow.keras.layers import Embedding, Reshape, Input, Dot, Dense, Dropout, BatchNormalization, Concatenate, Add, Flatten
 from tensorflow.keras import regularizers, optimizers
 
 
@@ -44,14 +44,14 @@ def Recmand_model(max_user, max_item, k):
     model_uer = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_uer)
     # model_uer = Dense(k, activation="relu", use_bias=True,)(model_uer)  # 激活函数
     # model_uer = Dense(50, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.005))(model_uer)  # 激活函数
-    model_uer = Reshape((-1,))(model_uer)
+    model_uer = Flatten()(model_uer)
 
     input_item = Input(shape=(1, ), name='item')
     model_item = Embedding(max_item + 1, k, input_length=1)(input_item)
     model_item = BatchNormalization(epsilon=0.001, momentum=0.99, axis=-1)(model_item)
     # model_item = Dense(k, activation="relu", use_bias=True,)(model_item)
     # model_item = Dense(50, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.005))(model_item)  # 激活函数
-    model_item = Reshape((-1,))(model_item)
+    model_item = Flatten()(model_item)
 
     FM = Dot(1)([model_uer, model_item])  # 点积运算
     FM = Dense(1, use_bias=True, kernel_regularizer=regularizers.l2(0.001))(FM)
