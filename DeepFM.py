@@ -67,6 +67,7 @@ def Recmand_model(max_user, max_item, k):
 
     Deep_model = Concatenate()([model_uer, model_item])
     Deep_model = Dense(64, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.015))(Deep_model)
+    Deep_model = Dropout(0.2)(Deep_model)
     Deep_model = Dense(32, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.01))(Deep_model)
     Deep_model = Dense(16, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.015))(Deep_model)
     Deep_model = Dense(8, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.015))(Deep_model)
