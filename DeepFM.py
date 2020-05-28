@@ -54,7 +54,7 @@ def Recmand_model(max_user, max_item, k):
     model_item = Flatten()(model_item)
 
     FM = Dot(1)([model_uer, model_item])  # 点积运算
-    FM = Dense(1, use_bias=True, kernel_regularizer=regularizers.l2(0.01))(FM)
+    FM = Dense(1, use_bias=True, kernel_regularizer=regularizers.l2(0.011))(FM)
 
 
     # Deep_user = Embedding(max_user + 1, k, input_length=1, )(input_user)
@@ -67,10 +67,10 @@ def Recmand_model(max_user, max_item, k):
 
     Deep_model = Concatenate()([model_uer, model_item])
     Deep_model = Dense(64, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.015))(Deep_model)
-    Deep_model = Dropout(0.2)(Deep_model)
+    Deep_model = Dropout(0.21)(Deep_model)
     Deep_model = Dense(32, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.01))(Deep_model)
     Deep_model = Dense(16, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.015))(Deep_model)
-    Deep_model = Dense(8, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.015))(Deep_model)
+    Deep_model = Dense(8, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.01))(Deep_model)
     Deep_model = Dense(4, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.015))(Deep_model)
     Deep_model = Dense(1, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.010))(Deep_model)
 
@@ -78,7 +78,7 @@ def Recmand_model(max_user, max_item, k):
     # DeepFM = Dense(1, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.01))(DeepFM)
 
     model = Model(inputs=[input_user, input_item], outputs=DeepFM)
-    model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.001), metrics=['mae'])
+    model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.0012), metrics=['mae'])
     # model.summary()
     # tf.keras.utils.plot_model(model, "DeepFM.png", show_shapes=True)
     return model
