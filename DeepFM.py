@@ -54,7 +54,7 @@ def Recmand_model(max_user, max_item, k):
     model_item = Flatten()(model_item)
 
     FM = Dot(1)([model_uer, model_item])  # 点积运算
-    # FM = Dense(1, use_bias=True, kernel_regularizer=regularizers.l2(0.01))(FM)
+    FM = Dense(1, use_bias=True, kernel_regularizer=regularizers.l2(0.01))(FM)
 
 
     # Deep_user = Embedding(max_user + 1, k, input_length=1, )(input_user)
