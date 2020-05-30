@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 import tensorflow as tf
 
-print(tf.__version__)
+print('tensorflow version is ',tf.__version__)
 
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
@@ -17,8 +17,9 @@ def root_mean_squared_error(y_true, y_pred):
 
 rnames = ['userId', 'movieId', 'rating', 'timestamp']
 rating = pd.read_csv("../ml-1m/ratings.dat", sep="::", names=rnames,header=None, engine='python')
-rating.info()
-rating = rating.sample(frac=1)
+train_data = rating.sample(frac=0.8, random_state=0)
+test_data =rating.drop(train_data.index)
+
 num_rating = len(rating['rating'])
 max_user = rating["userId"].max()
 max_movie = rating["movieId"].max()
@@ -92,3 +93,43 @@ train_y = rating["rating"].values
 
 history = model.fit(train_x, train_y, batch_size=256, epochs=12, verbose=1, validation_split=0.2)
 
+
+test_user =  test_data['userId'].values
+test_movie = test_data['movieId'].values
+test_x = [test_user, test_movie]
+test_y = test_data['rating'].values
+
+loss, mae = model.evaluate(test_x, test_y, verbose=2)
+print("evalute rmse:", loss)
+
+test_predictions = model.predict(test_x).flatten()
+print(test_predictions)
+
+def plot_history(history):
+  hist = pd.DataFrame(history.history)
+  hist['epoch'] = history.epoch
+
+  plt.figure()
+  plt.xlabel('Epoch')
+  plt.ylabel('RMSE [rating]')
+  plt.plot(hist['epoch'], hist['loss'],
+           label='Train RMSE')
+  plt.plot(hist['epoch'], hist['val_loss'],
+           label = 'Val RMSE')
+  plt.ylim([0,1.7])
+  plt.legend()
+
+  plt.figure()
+  plt.xlabel('Epoch')
+  plt.ylabel('MAE [rating]')
+  plt.plot(hist['epoch'], hist['mae'],
+           label='Train MAE')
+  plt.plot(hist['epoch'], hist['val_mae'],
+           label = 'Val MAE')
+  plt.ylim([0,1.2])
+  plt.legend()
+  plt.savefig('./resultImg/DeepFM.png')
+  # plt.show()
+
+
+plot_history(history)

@@ -130,7 +130,7 @@ def plot_history(history):
            label = 'Val MAE')
   plt.ylim([0,1.2])
   plt.legend()
-  plt.savefig('./resultImg/WideDeepFM.jpg')
+  plt.savefig('./resultImg/WideDeepFM.png')
   # plt.show()
 
 
