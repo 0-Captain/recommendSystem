@@ -98,7 +98,7 @@ test_y = test_data['rating'].values
 
 print('train:', len(train_y), '\ntest:',len(test_y))
 
-history = model.fit(train_x, train_y, batch_size=256, epochs=12, verbose=1, validation_data=[test_x, test_y])
+history = model.fit(train_x, train_y, batch_size=256, epochs=12, verbose=1, validation_split=0.2)
 
 
 loss, mae = model.evaluate(test_x, test_y, verbose=2)
