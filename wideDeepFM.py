@@ -34,7 +34,7 @@ print(pd.DataFrame({
 }, index=[0]))
 
 from tensorflow.keras import Model, utils
-from tensorflow.keras.layers import Embedding, Reshape, Input, Dot, Dense, Dropout, BatchNormalization, Concatenate, Add, Flatten
+from tensorflow.keras.layers import Embedding, Reshape, Input, Dot, Dense, Dropout, BatchNormalization, Concatenate, Add, Flatten, Activation
 from tensorflow.keras import regularizers, optimizers
 
 
