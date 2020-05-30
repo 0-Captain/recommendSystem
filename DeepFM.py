@@ -86,15 +86,17 @@ def Recmand_model(max_user, max_item, k):
 
 model = Recmand_model(max_user, max_movie, 50)
 
-train_user = rating['userId'].values
-train_movie = rating['movieId'].values
+train_user = train_data['userId'].values
+train_movie = train_data['movieId'].values
 train_x = [train_user, train_movie]
-train_y = rating["rating"].values
+train_y = train_data["rating"].values
 
 test_user =  test_data['userId'].values
 test_movie = test_data['movieId'].values
 test_x = [test_user, test_movie]
 test_y = test_data['rating'].values
+
+print('train:', len(train_y), '\ntest:',len(test_y))
 
 history = model.fit(train_x, train_y, batch_size=256, epochs=12, verbose=1, validation_data=[test_x, test_y])
 
