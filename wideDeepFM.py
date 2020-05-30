@@ -134,4 +134,4 @@ def plot_history(history):
   # plt.show()
 
 
-# plot_history(history)
+plot_history(history)
