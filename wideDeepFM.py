@@ -34,7 +34,7 @@ print(pd.DataFrame({
 }, index=[0]))
 
 from tensorflow.keras import Model, utils
-from tensorflow.keras.layers import Embedding, Reshape, Input, Dot, Dense, Dropout, BatchNormalization, Concatenate, Add, Flatten
+from tensorflow.keras.layers import Embedding, Reshape, Input, Dot, Dense, Dropout, BatchNormalization, Concatenate, Add, Flatten, Activation
 from tensorflow.keras import regularizers, optimizers
 
 
@@ -70,7 +70,7 @@ def Recmand_model(max_user, max_item, k):
     Deep_model = Dropout(0.2)(Deep_model)
     Deep_model = Dense(32, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.01))(Deep_model)
     Deep_model = Dense(16, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.015))(Deep_model)
-    Deep_model = Dense(8, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.015))(Deep_model)
+    Deep_model = Dense(8, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.01))(Deep_model)
     Deep_model = Dense(4, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.015))(Deep_model)
     Deep_model = Dense(1, activation="relu", use_bias=True, kernel_regularizer=regularizers.l2(0.010))(Deep_model)
 
@@ -78,7 +78,7 @@ def Recmand_model(max_user, max_item, k):
     wide = Dense(1, use_bias=True, activation='relu', kernel_regularizer=regularizers.l2(0.01))(wide)
 
     DeepFM = Add()([Deep_model, FM, wide])
-    # DeepFM = Dense(1, activation='relu', use_bias=True, kernel_regularizer=regularizers.l2(0.01))(DeepFM)
+    DeepFM = Activation("relu")(DeepFM)
 
     model = Model(inputs=[input_user, input_item], outputs=DeepFM)
     model.compile(loss=root_mean_squared_error, optimizer=optimizers.Adam(lr=0.001), metrics=['mae'])
