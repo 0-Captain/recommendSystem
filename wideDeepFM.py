@@ -120,6 +120,7 @@ def plot_history(history):
            label = 'Val RMSE')
   plt.ylim([0,1.7])
   plt.legend()
+  plt.savefig('./resultImg/WideDeepFM_rmse.png')
 
   plt.figure()
   plt.xlabel('Epoch')
@@ -130,7 +131,7 @@ def plot_history(history):
            label = 'Val MAE')
   plt.ylim([0,1.2])
   plt.legend()
-  plt.savefig('./resultImg/WideDeepFM.png')
+  plt.savefig('./resultImg/WideDeepFM_mae.png')
   # plt.show()
 
 
