@@ -91,13 +91,13 @@ train_movie = rating['movieId'].values
 train_x = [train_user, train_movie]
 train_y = rating["rating"].values
 
-history = model.fit(train_x, train_y, batch_size=256, epochs=12, verbose=1, validation_split=0.2)
-
-
 test_user =  test_data['userId'].values
 test_movie = test_data['movieId'].values
 test_x = [test_user, test_movie]
 test_y = test_data['rating'].values
+
+history = model.fit(train_x, train_y, batch_size=256, epochs=12, verbose=1, validation_data=[test_x, test_y])
+
 
 loss, mae = model.evaluate(test_x, test_y, verbose=2)
 print("evalute rmse:", loss)
